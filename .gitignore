@@ -1,4 +1,18 @@
-venv/
+# Virtual environment
+.venv/
+
+# Python
 __pycache__/
 *.pyc
+
+# VSCode
 .vscode/
+
+# RoboDK temporales
+*.bak
+
+# Python cache
+.pytest_cache/
+
+# Logs
+*.log
