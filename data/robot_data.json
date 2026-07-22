@@ -1,10 +1,10 @@
 {
-    "x": 285.9375,
-    "y": 216.66666666666669,
-    "area": 200.0,
+    "x": -54.375,
+    "y": 91.66666666666667,
+    "area": 15.0,
     "direccion": "Izquierda",
-    "velocidad": 2.0,
-    "velocidad_media": 1365.337891010611,
-    "distancia": 136533.7891010611,
+    "velocidad": 0.0,
+    "velocidad_media": 889.7276552428008,
+    "distancia": 88972.76552428008,
     "estado": "Dentro del espacio"
 }

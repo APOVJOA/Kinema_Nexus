@@ -40,7 +40,21 @@ class HumanPose:
 
         print("LEFT WRIST :", self.left_wrist)
         print("RIGHT WRIST:", self.right_wrist)
+
     def print_all(self):
 
         for nombre, landmark in self.__dict__.items():
             print(f"{nombre:15} -> {landmark}")
+    def get_arm_landmarks(self):
+    
+    #Devuelve únicamente las articulaciones de ambos brazos.
+    
+
+        return {
+        "left_shoulder": self.left_shoulder,
+        "right_shoulder": self.right_shoulder,
+        "left_elbow": self.left_elbow,
+        "right_elbow": self.right_elbow,
+        "left_wrist": self.left_wrist,
+        "right_wrist": self.right_wrist,
+    }

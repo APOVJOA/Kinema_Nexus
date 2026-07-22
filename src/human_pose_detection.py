@@ -2,6 +2,7 @@ import cv2
 from ultralytics import YOLO
 
 from pose import HumanPose
+from pose_drawer import draw_pose
 
 # -----------------------------
 # Cargar modelo
@@ -114,16 +115,9 @@ while True:
         pose.right_ankle.y = float(puntos[16][1])
         pose.right_ankle.confidence = float(conf[16])
 
-        # Mostrar por consola
         pose.print_pose()
 
-    # -----------------------------
-    # Dibujar resultado
-    # -----------------------------
-
-    annotated = results[0].plot()
-
-    cv2.imshow("YOLO Pose", annotated)
+        draw_pose(frame, pose)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
