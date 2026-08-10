@@ -1,6 +1,6 @@
 import cv2
 
-from pose_math import calculate_vector, calculate_angle
+from pose_math import calculate_vector, calculate_angle, calculate_distance
 
 
 # ==========================================================
@@ -109,6 +109,85 @@ def draw_angles(img, pose):
 
 
 # ==========================================================
+# DISTANCES
+# ==========================================================
+
+def draw_distances(img, pose):
+
+    # -----------------------------
+    # Brazo izquierdo
+    # -----------------------------
+
+    distancia_brazo_izquierdo = calculate_distance(
+        pose.left_shoulder,
+        pose.left_elbow
+    )
+
+    distancia_antebrazo_izquierdo = calculate_distance(
+        pose.left_elbow,
+        pose.left_wrist
+    )
+
+    # -----------------------------
+    # Brazo derecho
+    # -----------------------------
+
+    distancia_brazo_derecho = calculate_distance(
+        pose.right_shoulder,
+        pose.right_elbow
+    )
+
+    distancia_antebrazo_derecho = calculate_distance(
+        pose.right_elbow,
+        pose.right_wrist
+    )
+
+    # -----------------------------
+    # Mostrar distancias
+    # -----------------------------
+
+    cv2.putText(
+        img,
+        f"LB: {distancia_brazo_izquierdo:.1f}px",
+        (20, 30),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (255, 255, 255),
+        2
+    )
+
+    cv2.putText(
+        img,
+        f"LFA: {distancia_antebrazo_izquierdo:.1f}px",
+        (20, 55),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (255, 255, 255),
+        2
+    )
+
+    cv2.putText(
+        img,
+        f"RB: {distancia_brazo_derecho:.1f}px",
+        (20, 80),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (255, 255, 255),
+        2
+    )
+
+    cv2.putText(
+        img,
+        f"RFA: {distancia_antebrazo_derecho:.1f}px",
+        (20, 105),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (255, 255, 255),
+        2
+    )
+
+
+# ==========================================================
 # DRAW COMPLETE POSE
 # ==========================================================
 
@@ -120,22 +199,49 @@ def draw_pose(frame, pose):
     # Hombros
     # -----------------------------
 
-    draw_landmark(frame_draw, pose.left_shoulder, (0, 0, 255))
-    draw_landmark(frame_draw, pose.right_shoulder, (0, 0, 255))
+    draw_landmark(
+        frame_draw,
+        pose.left_shoulder,
+        (0, 0, 255)
+    )
+
+    draw_landmark(
+        frame_draw,
+        pose.right_shoulder,
+        (0, 0, 255)
+    )
 
     # -----------------------------
     # Codos
     # -----------------------------
 
-    draw_landmark(frame_draw, pose.left_elbow, (0, 255, 0))
-    draw_landmark(frame_draw, pose.right_elbow, (0, 255, 0))
+    draw_landmark(
+        frame_draw,
+        pose.left_elbow,
+        (0, 255, 0)
+    )
+
+    draw_landmark(
+        frame_draw,
+        pose.right_elbow,
+        (0, 255, 0)
+    )
 
     # -----------------------------
     # Muñecas
     # -----------------------------
 
-    draw_landmark(frame_draw, pose.left_wrist, (255, 0, 0))
-    draw_landmark(frame_draw, pose.right_wrist, (255, 0, 0))
+    draw_landmark(
+        frame_draw,
+        pose.left_wrist,
+        (255, 0, 0)
+    )
+
+    draw_landmark(
+        frame_draw,
+        pose.right_wrist,
+        (255, 0, 0)
+    )
 
     # -----------------------------
     # Brazo izquierdo
@@ -173,6 +279,25 @@ def draw_pose(frame, pose):
     # Ángulos
     # -----------------------------
 
-    draw_angles(frame_draw, pose)
+    draw_angles(
+        frame_draw,
+        pose
+    )
 
-    cv2.imshow("KINEMA NEXUS", frame_draw)
+    # -----------------------------
+    # Distancias
+    # -----------------------------
+
+    draw_distances(
+        frame_draw,
+        pose
+    )
+
+    # -----------------------------
+    # Mostrar resultado
+    # -----------------------------
+
+    cv2.imshow(
+        "KINEMA NEXUS",
+        frame_draw
+    )
