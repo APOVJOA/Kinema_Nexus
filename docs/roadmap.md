@@ -298,7 +298,7 @@ Crear las herramientas matemáticas necesarias para analizar el movimiento human
 
 ## Fase 17.1 — Arm Vector Analysis
 
-**Estado:** Pendiente
+**Estado:** Completada
 
 ### Objetivo
 
@@ -315,7 +315,7 @@ Representar matemáticamente los segmentos del brazo humano.
 
 ## Fase 17.2 — Joint Angle Analysis
 
-**Estado:** Pendiente
+**Estado:** completada
 
 ### Objetivo
 
@@ -332,7 +332,7 @@ Calcular los ángulos de las articulaciones relevantes.
 
 ## Fase 17.3 — Pose Constraints
 
-**Estado:** Pendiente
+**Estado:** Pendiente preparada
 
 ### Objetivo
 

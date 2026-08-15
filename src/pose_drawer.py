@@ -148,7 +148,7 @@ def draw_distances(img, pose):
 
     cv2.putText(
         img,
-        f"LB: {distancia_brazo_izquierdo:.1f}px",
+        f"Brazo Izquierdo: {distancia_brazo_izquierdo:.1f}px",
         (20, 30),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.6,
@@ -158,7 +158,7 @@ def draw_distances(img, pose):
 
     cv2.putText(
         img,
-        f"LFA: {distancia_antebrazo_izquierdo:.1f}px",
+        f"Antebrazp Izquierdo: {distancia_antebrazo_izquierdo:.1f}px",
         (20, 55),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.6,
@@ -168,7 +168,7 @@ def draw_distances(img, pose):
 
     cv2.putText(
         img,
-        f"RB: {distancia_brazo_derecho:.1f}px",
+        f"Brazo Derecho: {distancia_brazo_derecho:.1f}px",
         (20, 80),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.6,
@@ -178,7 +178,7 @@ def draw_distances(img, pose):
 
     cv2.putText(
         img,
-        f"RFA: {distancia_antebrazo_derecho:.1f}px",
+        f"Antebrazo Derecho: {distancia_antebrazo_derecho:.1f}px",
         (20, 105),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.6,
