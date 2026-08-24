@@ -1,11 +1,15 @@
 import cv2
+import json
+import time
+import subprocess
 import numpy as np
+import sys
 from pathlib import Path
 
 from ultralytics import YOLO
 
 from pose import HumanPose
-from pose_math import calculate_vector, calculate_angle
+from pose_math import calculate_vector, calculate_angle, calculate_distance
 
 
 # ==========================================================
@@ -29,6 +33,9 @@ MIN_CONFIDENCE = 0.3
 
 MIN_ANGLE = 50
 MAX_ANGLE = 170
+
+CALIBRATION_DURATION = 4.0
+SAMPLE_INTERVAL = 0.25
 
 
 # ==========================================================
@@ -69,6 +76,23 @@ def resize_reference_image(image):
     ] = resized
 
     return panel
+# ==========================================================
+# INICIAR HUMAN POSE DETECTION
+# ==========================================================
+
+def start_human_pose_detection():
+
+    human_pose_path = (
+        Path(__file__).resolve().parent
+        / "human_pose_detection.py"
+    )
+
+    print("Calibración completada.")
+    print("Iniciando Human Pose Detection...")
+
+    subprocess.run(
+        [sys.executable, str(human_pose_path)]
+    )
 
 
 # ==========================================================
@@ -203,6 +227,68 @@ def check_pose_angles(pose):
 
 
 # ==========================================================
+# MEDIR DISTANCIAS
+# ==========================================================
+
+def calculate_pose_measurements(pose):
+
+    return {
+        "left_arm_length": calculate_distance(
+            pose.left_shoulder,
+            pose.left_elbow
+        ),
+
+        "left_forearm_length": calculate_distance(
+            pose.left_elbow,
+            pose.left_wrist
+        ),
+
+        "right_arm_length": calculate_distance(
+            pose.right_shoulder,
+            pose.right_elbow
+        ),
+
+        "right_forearm_length": calculate_distance(
+            pose.right_elbow,
+            pose.right_wrist
+        )
+    }
+
+
+# ==========================================================
+# GUARDAR CALIBRACIÓN
+# ==========================================================
+
+def save_calibration(measurements):
+
+    calibration_file = (
+        Path(__file__).resolve().parent.parent
+        / "data"
+        / "calibration.json"
+    )
+
+    calibration_file.parent.mkdir(
+        exist_ok=True
+    )
+
+    with open(
+        calibration_file,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            measurements,
+            file,
+            indent=4
+        )
+
+    print(
+        f"Calibración guardada en: {calibration_file}"
+    )
+
+
+# ==========================================================
 # DIBUJAR LANDMARKS
 # ==========================================================
 
@@ -313,6 +399,23 @@ def start_calibration():
 
         return
 
+    # ------------------------------------------------------
+    # Variables de calibración
+    # ------------------------------------------------------
+
+    calibrating = False
+
+    calibration_start_time = None
+
+    last_sample_time = None
+
+    measurements = {
+        "left_arm_length": [],
+        "left_forearm_length": [],
+        "right_arm_length": [],
+        "right_forearm_length": []
+    }
+
     # ======================================================
     # BUCLE PRINCIPAL
     # ======================================================
@@ -357,9 +460,12 @@ def start_calibration():
 
         draw_calibration_messages(frame)
 
-        # --------------------------------------------------
-        # Comprobar persona
-        # --------------------------------------------------
+        # ==================================================
+        # DETECCIÓN DE PERSONA
+        # ==================================================
+
+        pose_valid = False
+        pose = None
 
         if (
             keypoints is not None
@@ -374,19 +480,211 @@ def start_calibration():
                 )
 
                 # Comprobar postura
-                if check_pose_angles(pose):
+                pose_valid = check_pose_angles(
+                    pose
+                )
 
-                    cv2.putText(
-                        frame,
-                        "POSTURA CORRECTA",
-                        (20, 135),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.6,
-                        (0, 255, 0),
-                        2
+        # ==================================================
+        # POSTURA CORRECTA
+        # ==================================================
+
+        if pose_valid:
+
+            cv2.putText(
+                frame,
+                "POSTURA CORRECTA",
+                (20, 135),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 0),
+                2
+            )
+
+            # --------------------------------------------------
+            # INICIAR CALIBRACIÓN
+            # --------------------------------------------------
+
+            if not calibrating:
+
+                calibrating = True
+
+                calibration_start_time = time.time()
+
+                last_sample_time = calibration_start_time
+
+                measurements = {
+                    "left_arm_length": [],
+                    "left_forearm_length": [],
+                    "right_arm_length": [],
+                    "right_forearm_length": []
+                }
+
+            # --------------------------------------------------
+            # TIEMPO DE CALIBRACIÓN
+            # --------------------------------------------------
+
+            current_time = time.time()
+
+            calibration_elapsed = (
+                current_time
+                - calibration_start_time
+            )
+
+            # --------------------------------------------------
+            # TOMAR MUESTRA
+            # --------------------------------------------------
+
+            if (
+                current_time - last_sample_time
+                >= SAMPLE_INTERVAL
+            ):
+
+                sample = calculate_pose_measurements(
+                    pose
+                )
+
+                measurements[
+                    "left_arm_length"
+                ].append(
+                    sample["left_arm_length"]
+                )
+
+                measurements[
+                    "left_forearm_length"
+                ].append(
+                    sample["left_forearm_length"]
+                )
+
+                measurements[
+                    "right_arm_length"
+                ].append(
+                    sample["right_arm_length"]
+                )
+
+                measurements[
+                    "right_forearm_length"
+                ].append(
+                    sample["right_forearm_length"]
+                )
+
+                last_sample_time = current_time
+
+            # --------------------------------------------------
+            # MOSTRAR PROGRESO
+            # --------------------------------------------------
+
+            remaining_time = max(
+                0,
+                CALIBRATION_DURATION
+                - calibration_elapsed
+            )
+
+            if calibrating:
+
+                cv2.putText(
+                    frame,
+                    f"CALIBRANDO: {remaining_time:.1f}s",
+                    (20, 165),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    (0, 255, 255),
+                    2
+                )
+
+            # --------------------------------------------------
+            # FINALIZAR CALIBRACIÓN
+            # --------------------------------------------------
+
+            if (
+                calibrating
+                and calibration_elapsed >= CALIBRATION_DURATION
+            ):
+
+                if len(
+                    measurements["left_arm_length"]
+                ) > 0:
+
+                    calibrated_measurements = {
+
+                        "left_arm_length": float(
+                            np.mean(
+                                measurements[
+                                    "left_arm_length"
+                                ]
+                            )
+                        ),
+
+                        "left_forearm_length": float(
+                            np.mean(
+                                measurements[
+                                    "left_forearm_length"
+                                ]
+                            )
+                        ),
+
+                        "right_arm_length": float(
+                            np.mean(
+                                measurements[
+                                    "right_arm_length"
+                                ]
+                            )
+                        ),
+
+                        "right_forearm_length": float(
+                            np.mean(
+                                measurements[
+                                    "right_forearm_length"
+                                ]
+                            )
+                        )
+                    }
+
+                    save_calibration(
+                        calibrated_measurements
                     )
 
-                else:
+                    print(
+                        "================================"
+                    )
+
+                    print(
+                        "CALIBRACION COMPLETADA"
+                    )
+
+                    print(
+                        calibrated_measurements
+                    )
+
+                    print(
+                        "================================"
+                    )
+
+                    calibrating = False
+
+                    calibration_start_time = None
+
+                    last_sample_time = None
+                   
+                    cap.release()
+                    cv2.destroyAllWindows()
+
+                    start_human_pose_detection()
+
+
+                    return
+
+        # ==================================================
+        # POSTURA INCORRECTA / PERSONA NO DETECTADA
+        # ==================================================
+
+        else:
+
+            if (
+                keypoints is not None
+                and len(keypoints.xy) > 0
+            ):
+
+                if detect_upper_body(keypoints):
 
                     cv2.putText(
                         frame,
@@ -398,11 +696,23 @@ def start_calibration():
                         2
                     )
 
+                else:
+
+                    cv2.putText(
+                        frame,
+                        "COLOCA LOS BRAZOS DENTRO DE LA CAMARA",
+                        (20, 135),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.6,
+                        (0, 0, 255),
+                        2
+                    )
+
             else:
 
                 cv2.putText(
                     frame,
-                    "COLOCA LOS BRAZOS DENTRO DE LA CAMARA",
+                    "NO SE DETECTA NINGUNA PERSONA",
                     (20, 135),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.6,
@@ -410,18 +720,18 @@ def start_calibration():
                     2
                 )
 
-        # --------------------------------------------------
-        # Preparar cámara
-        # --------------------------------------------------
+        # ==================================================
+        # PREPARAR CÁMARA
+        # ==================================================
 
         camera_panel = cv2.resize(
             frame,
             (PANEL_WIDTH, PANEL_HEIGHT)
         )
 
-        # --------------------------------------------------
-        # Mostrar referencia + cámara
-        # --------------------------------------------------
+        # ==================================================
+        # MOSTRAR REFERENCIA + CÁMARA
+        # ==================================================
 
         combined = cv2.hconcat(
             [
@@ -435,17 +745,17 @@ def start_calibration():
             combined
         )
 
-        # --------------------------------------------------
-        # Salir
-        # --------------------------------------------------
+        # ==================================================
+        # SALIR
+        # ==================================================
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
 
             break
 
-    # ------------------------------------------------------
-    # Liberar recursos
-    # ------------------------------------------------------
+    # ======================================================
+    # LIBERAR RECURSOS
+    # ======================================================
 
     cap.release()
 

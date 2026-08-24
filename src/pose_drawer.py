@@ -1,6 +1,6 @@
 import cv2
 
-from pose_math import calculate_vector, calculate_angle, calculate_distance
+from pose_math import calculate_vector, calculate_angle#, calculate_distance
 
 
 # ==========================================================
@@ -112,79 +112,47 @@ def draw_angles(img, pose):
 # DISTANCES
 # ==========================================================
 
-def draw_distances(img, pose):
+#def draw_distances(img, pose):
 
     # -----------------------------
     # Brazo izquierdo
     # -----------------------------
 
-    distancia_brazo_izquierdo = calculate_distance(
-        pose.left_shoulder,
-        pose.left_elbow
-    )
+    #distancia_brazo_izquierdo = calculate_distance(
+    #    pose.left_shoulder,
+    #    pose.left_elbow
+    #)
 
-    distancia_antebrazo_izquierdo = calculate_distance(
-        pose.left_elbow,
-        pose.left_wrist
-    )
+    #distancia_antebrazo_izquierdo = calculate_distance(
+    #    pose.left_elbow,
+    #    pose.left_wrist
+    #)
 
     # -----------------------------
     # Brazo derecho
     # -----------------------------
 
-    distancia_brazo_derecho = calculate_distance(
-        pose.right_shoulder,
-        pose.right_elbow
-    )
+    #distancia_brazo_derecho = calculate_distance(
+    #    pose.right_shoulder,
+    #    pose.right_elbow
+    #)
 
-    distancia_antebrazo_derecho = calculate_distance(
-        pose.right_elbow,
-        pose.right_wrist
-    )
+    #distancia_antebrazo_derecho = calculate_distance(
+    #    pose.right_elbow,
+    #    pose.right_wrist
+    #)
 
     # -----------------------------
     # Mostrar distancias
     # -----------------------------
 
-    cv2.putText(
-        img,
-        f"Brazo Izquierdo: {distancia_brazo_izquierdo:.1f}px",
-        (20, 30),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (255, 255, 255),
-        2
-    )
+    #cv2.putText(img,f"Brazo Izquierdo: {distancia_brazo_izquierdo:.1f}px",(20, 30),cv2.FONT_HERSHEY_SIMPLEX,0.6,(255, 255, 255),2)
 
-    cv2.putText(
-        img,
-        f"Antebrazp Izquierdo: {distancia_antebrazo_izquierdo:.1f}px",
-        (20, 55),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (255, 255, 255),
-        2
-    )
+    #cv2.putText(img,f"Antebrazp Izquierdo: {distancia_antebrazo_izquierdo:.1f}px",(20, 55),cv2.FONT_HERSHEY_SIMPLEX,0.6,(255, 255, 255),2)
 
-    cv2.putText(
-        img,
-        f"Brazo Derecho: {distancia_brazo_derecho:.1f}px",
-        (20, 80),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (255, 255, 255),
-        2
-    )
+    #cv2.putText(img,f"Brazo Derecho: {distancia_brazo_derecho:.1f}px",(20, 80),cv2.FONT_HERSHEY_SIMPLEX,0.6,(255, 255, 255),2)
 
-    cv2.putText(
-        img,
-        f"Antebrazo Derecho: {distancia_antebrazo_derecho:.1f}px",
-        (20, 105),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (255, 255, 255),
-        2
-    )
+    #cv2.putText(img,f"Antebrazo Derecho: {distancia_antebrazo_derecho:.1f}px",(20, 105),cv2.FONT_HERSHEY_SIMPLEX,0.6,(255, 255, 255),2)
 
 
 # ==========================================================
@@ -288,10 +256,10 @@ def draw_pose(frame, pose):
     # Distancias
     # -----------------------------
 
-    draw_distances(
-        frame_draw,
-        pose
-    )
+    #draw_distances(
+    #    frame_draw,
+    #    pose
+    #)
 
     # -----------------------------
     # Mostrar resultado
