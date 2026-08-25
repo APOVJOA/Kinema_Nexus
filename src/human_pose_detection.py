@@ -4,6 +4,8 @@ from ultralytics import YOLO
 from pose import HumanPose
 from pose_drawer import draw_pose
 
+from robot_mapping import load_robot_mapping
+robot_mapping = load_robot_mapping()
 # -----------------------------
 # Cargar modelo
 # -----------------------------
