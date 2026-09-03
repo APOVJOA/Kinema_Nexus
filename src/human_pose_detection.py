@@ -4,7 +4,9 @@ from ultralytics import YOLO
 from pose import HumanPose
 from pose_drawer import draw_pose
 
+from relative_pose import calculate_relative_arm_pose
 from robot_mapping import load_robot_mapping
+from robot_motion import update_robot_motion
 robot_mapping = load_robot_mapping()
 # -----------------------------
 # Cargar modelo
@@ -118,7 +120,12 @@ while True:
         pose.right_ankle.confidence = float(conf[16])
 
         pose.print_pose()
+        relative_pose = calculate_relative_arm_pose(pose)
+        print(relative_pose)
 
+        robot_motion = update_robot_motion(relative_pose)
+
+        print(robot_motion)
         draw_pose(frame, pose)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
