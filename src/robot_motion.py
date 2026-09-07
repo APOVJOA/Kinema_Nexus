@@ -3,8 +3,6 @@ from pathlib import Path
 import math
 
 from pose_math import calculate_angle
-
-
 # ==========================================================
 # CONFIGURACIÓN
 # ==========================================================
@@ -42,18 +40,19 @@ def clamp(value, minimum, maximum):
     )
 
 
+
 # ==========================================================
-# CALCULAR MOVIMIENTO DEL ROBOT
+# CALCULAR MOVIMIENTO DE UN BRAZO
 # ==========================================================
 
-def calculate_robot_motion(relative_pose):
+def calculate_arm_motion(arm_pose):
 
     # ------------------------------------------------------
-    # Obtener vectores del brazo derecho
+    # Obtener vectores del brazo
     # ------------------------------------------------------
 
-    upper_arm = relative_pose["right_arm"]["upper_arm"]
-    forearm = relative_pose["right_arm"]["forearm"]
+    upper_arm = arm_pose["upper_arm"]
+    forearm = arm_pose["forearm"]
 
     # ------------------------------------------------------
     # Ángulo del brazo respecto al eje X
@@ -120,6 +119,38 @@ def calculate_robot_motion(relative_pose):
             0.0,
             0.0
         ]
+    }
+
+
+# ==========================================================
+# CALCULAR MOVIMIENTO DE LOS DOS ROBOTS
+# ==========================================================
+
+def calculate_robot_motion(relative_pose):
+
+    # ------------------------------------------------------
+    # Robot derecho
+    # ------------------------------------------------------
+
+    right_robot = calculate_arm_motion(
+        relative_pose["right_arm"]
+    )
+
+    # ------------------------------------------------------
+    # Robot izquierdo
+    # ------------------------------------------------------
+
+    left_robot = calculate_arm_motion(
+        relative_pose["left_arm"]
+    )
+
+    # ------------------------------------------------------
+    # Crear estructura final
+    # ------------------------------------------------------
+
+    return {
+        "right_robot": right_robot,
+        "left_robot": left_robot
     }
 
 
